@@ -40,6 +40,41 @@ function showMessage(id,msg,error=false){$(id).textContent=msg;$(id).style.color
 function showTab(id){if(id==='plans'&&!isLeader){alert('هذه الصفحة مخصصة لرائدة النشاط.');return}document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id!=='printArea')window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;showMessage('loginMessage','جارٍ التحقق من بيانات الدخول...');const {error}=await db.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});$('loginBtn').disabled=false;if(error){showMessage('loginMessage','تعذر تسجيل الدخول. تحققي من البريد وكلمة المرور وأن الحساب موجود في Supabase.',true);return}showMessage('loginMessage','تم تسجيل الدخول.')});
+ 
+$('signupBtn').addEventListener('click',async()=>{
+  const email=$('loginEmail').value.trim();
+  const password=$('loginPassword').value;
+  if(!email||!password){
+    showMessage('loginMessage','أدخلي البريد الإلكتروني وكلمة المرور أولاً.',true);
+    return;
+  }
+  if(password.length<6){
+    showMessage('loginMessage','يجب ألا تقل كلمة المرور عن 6 أحرف.',true);
+    return;
+  }
+  $('signupBtn').disabled=true;
+  showMessage('loginMessage','جارٍ إنشاء الحساب...');
+  try{
+    const {data,error}=await db.auth.signUp({
+      email,
+      password,
+      options:{
+        emailRedirectTo:'https://school-activity-reports-ydgq.vercel.app'
+      }
+    });
+    if(error) throw error;
+    if(data.session){
+      showMessage('loginMessage','تم إنشاء الحساب. يمكنك المتابعة.');
+    }else{
+      showMessage('loginMessage','تم إرسال طلب التسجيل. تحققي من بريدك الإلكتروني لتأكيد الحساب.');
+    }
+  }catch(error){
+    showMessage('loginMessage','تعذر إنشاء الحساب: '+error.message,true);
+  }finally{
+    $('signupBtn').disabled=false;
+  }
+});
+ 
 async function logout(){await db.auth.signOut();}
 db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>handleSession(session),0)});
 async function handleSession(session){currentUser=session?.user||null;$('authScreen').classList.toggle('hidden',!!currentUser);$('appScreen').classList.toggle('hidden',!currentUser);if(!currentUser){reports=[];plans=[];return} $('accountLabel').textContent=currentUser.email||'حساب مسجل';await detectRole();await loadReports();if(isLeader)await loadPlans();else{$('plansTab').classList.add('hidden');document.querySelectorAll('.leaderOnly').forEach(el=>el.classList.add('hidden'));$('planCount').textContent='—';$('plansTable').innerHTML='<div class="empty">هذه الصفحة مخصصة لرائدة النشاط.</div>'}}
