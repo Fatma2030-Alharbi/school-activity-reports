@@ -13,7 +13,35 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<div id="authScreen" class="authwrap"><div class="panel"><h1 style="margin-top:0">تسجيل الدخول</h1><p class="muted">منصة تقارير النشاط الطلابي · الابتدائية الرابعة برياض الخبراء</p><form id="loginForm"><div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="field" style="margin-top:12px"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><div class="actions"><button class="primary" id="loginBtn" type="submit">دخول آمن</button></div><p id="loginMessage" class="statusline" role="status"></p></form><div class="note">الدخول متاح للحسابات التي أُنشئت مسبقًا في Supabase. لا يوجد تسجيل عام من هذه الصفحة.</div></div></div>
+
+<div id="authScreen" class="authwrap">
+  <div class="panel">
+    <h1 style="margin-top:0">منصة تقارير النشاط الطلابي</h1>
+    <p class="muted">الابتدائية الرابعة برياض الخبراء</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">البريد الإلكتروني</label>
+        <input id="loginEmail" type="email" autocomplete="username" required>
+      </div>
+
+      <div class="field" style="margin-top:12px">
+        <label for="loginPassword">كلمة المرور</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="loginBtn" type="submit">دخول آمن</button>
+        <button class="secondary" id="signupBtn" type="button">إنشاء حساب للمعلمات</button>
+      </div>
+
+      <p id="loginMessage" class="statusline" role="status"></p>
+    </form>
+
+    <div class="note">يمكن للمعلمات إنشاء حساب بالبريد الإلكتروني وكلمة المرور، وقد يلزم تأكيد البريد الإلكتروني.</div>
+  </div>
+</div>
+
 <div id="appScreen" class="app hidden">
 <header><div class="head"><div class="seal">✦</div><div class="brand"><h1>منصة تقارير النشاط الطلابي</h1><p>الابتدائية الرابعة برياض الخبراء · إدارة تعليم القصيم</p></div><div class="identity">رائدة النشاط: فاطمة الحربي<br>مديرة المدرسة: منال الحربي</div></div></header>
 <main class="wrap">
