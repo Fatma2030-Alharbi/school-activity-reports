@@ -7,7 +7,29 @@
 :root{color-scheme:light dark;--bg:light-dark(#f4f7f6,#101b1b);--panel:light-dark(#fff,#182625);--text:light-dark(#193a36,#edf5f2);--muted:light-dark(#617570,#aabbb5);--line:light-dark(#dce7e2,#30413d);--green:light-dark(#176b5b,#66c6a9);--soft:light-dark(#e7f3ee,#203b34);--gold:light-dark(#c59b42,#e4c16d)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;line-height:1.65}.app{min-height:100vh}header{background:linear-gradient(115deg,#123f39,#1e6b5a);color:#fff;padding:24px clamp(16px,4vw,52px)}.head{max-width:1200px;margin:auto;display:flex;align-items:center;gap:18px}.seal{width:62px;height:62px;border:1px solid #ffffff70;border-radius:18px;display:grid;place-items:center;font-size:28px;background:#ffffff12;flex-shrink:0}.brand h1{font-size:clamp(20px,3vw,29px);margin:0 0 4px}.brand p{margin:0;color:#d4e8e1;font-size:14px}.identity{margin-right:auto;text-align:left;font-size:13px;color:#e2f1eb}.wrap{max-width:1200px;margin:24px auto;padding:0 18px 36px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.tab,button{font:inherit;cursor:pointer;border:0;border-radius:11px;padding:10px 15px}.tab{background:var(--panel);border:1px solid var(--line);color:var(--text)}.tab.active,button.primary{background:var(--green);color:#fff}.tab.active{border-color:var(--green)}button.secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}button.danger{background:#a73e3e;color:white}button:disabled{opacity:.55;cursor:not-allowed}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:18px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:29px;margin-top:5px;color:var(--green)}.panel h2{font-size:19px;margin:0 0 14px}.muted{color:var(--muted)}.section{display:none}.section.active{display:block}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:14px;font-weight:700}input,select,textarea{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px;width:100%;min-width:0}textarea{min-height:100px;resize:vertical}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:700px}th,td{text-align:right;padding:12px 10px;border-bottom:1px solid var(--line);font-size:14px}th{color:var(--muted);font-weight:700;background:var(--soft)}.pill{display:inline-block;border-radius:20px;padding:3px 9px;background:var(--soft);font-size:12px}.empty{text-align:center;padding:30px;color:var(--muted)}.note{border-right:4px solid var(--gold);padding:10px 13px;background:var(--soft);border-radius:8px;margin-top:16px;font-size:13px}.files{display:flex;flex-wrap:wrap;gap:8px}.reportview{max-width:800px;margin:auto}.reportview h1{text-align:center}.footer{border-top:1px solid var(--line);margin-top:24px;padding-top:14px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;font-size:13px;color:var(--muted)}.mini{font-size:12px;color:var(--muted)}.authwrap{max-width:470px;margin:7vh auto;padding:18px}.authwrap .panel{padding:24px}.statusline{font-size:13px;color:var(--muted);margin-top:8px}.hidden{display:none!important}.cardchoice{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.cardchoice button{flex:1;min-width:190px}.printhead{display:none}@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:1fr}.identity{display:none}.wrap{margin-top:15px}.stat,.panel{padding:14px}}@media print{body{background:white;color:#111}.app{background:white}.noprint,header,.tabs,.grid,.note,.footer button{display:none!important}.wrap{margin:0;padding:0;max-width:none}.section{display:none!important}#printArea{display:block!important;color:#111}.panel{border:0;background:white}.printhead{display:block;text-align:center}.printtable{width:100%}}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head><body>
-<div id="authScreen" class="authwrap"><div class="panel"><h1 style="margin-top:0">منصة تقارير النشاط الطلابي</h1><p class="muted">الابتدائية الرابعة برياض الخبراء</p><form id="loginForm"><div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="field" style="margin-top:12px"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><div class="actions"><button class="primary" id="loginBtn" type="submit">دخول آمن</button><button class="secondary" id="signupBtn" type="button">إنشاء حساب للمعلمات</button></div><p id="loginMessage" class="statusline" role="status"></p></form><div class="note">قد يلزم تأكيد البريد الإلكتروني بعد إنشاء الحساب.</div></div></div>
+<div id="authScreen" class="authwrap"><div class="panel"><h1 style="margin-top:0">منصة تقارير النشاط الطلابي</h1><p class="muted">الابتدائية الرابعة برياض الخبراء</p><form id="loginForm"><div class="field"><label for="loginEmail">البريد الإلكتروني</label><input id="loginEmail" type="email" autocomplete="username" required></div><div class="field" style="margin-top:12px"><label for="loginPassword">كلمة المرور</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><div class="actions"><button class="primary" id="loginBtn" type="submit">دخول آمن</button><button class="secondary" id="signupBtn" type="button">إنشاء حساب للمعلمات</button><button class="secondary" id="forgotPasswordBtn" type="button">نسيت كلمة المرور؟</button></div><p id="loginMessage" class="statusline" role="status"></p></form><div class="note">قد يلزم تأكيد البريد الإلكتروني بعد إنشاء الحساب.</div></div></div>
+
+<div id="resetScreen" class="authwrap hidden">
+  <div class="panel">
+    <h1>تعيين كلمة مرور جديدة</h1>
+    <p class="muted">الابتدائية الرابعة برياض الخبراء</p>
+    <form id="resetForm">
+      <div class="field">
+        <label for="newPassword">كلمة المرور الجديدة</label>
+        <input id="newPassword" type="password" minlength="6" required>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label for="confirmPassword">تأكيد كلمة المرور</label>
+        <input id="confirmPassword" type="password" minlength="6" required>
+      </div>
+      <div class="actions">
+        <button class="primary" id="savePasswordBtn" type="submit">حفظ كلمة المرور</button>
+        <button class="secondary" id="cancelResetBtn" type="button">العودة لتسجيل الدخول</button>
+      </div>
+      <p id="resetMessage" class="statusline" role="status"></p>
+    </form>
+  </div>
+</div>
 <div id="appScreen" class="app hidden"><header><div class="head"><div class="seal">✦</div><div class="brand"><h1>منصة تقارير النشاط الطلابي</h1><p>الابتدائية الرابعة برياض الخبراء · إدارة تعليم القصيم</p></div><div class="identity">رائدة النشاط: فاطمة الحربي<br>مديرة المدرسة: منال الحربي</div></div></header><main class="wrap">
 <div class="actions noprint" style="justify-content:flex-end;margin:0 0 12px"><span id="accountLabel" class="mini" style="align-self:center"></span><button class="secondary" onclick="logout()">تسجيل الخروج</button></div>
 <div class="tabs noprint"><button class="tab active" data-tab="home">لوحة المتابعة</button><button class="tab" data-tab="new">تقرير نشاط</button><button class="tab" data-tab="program">بطاقة تنفيذ برنامج</button><button class="tab" data-tab="competition">بطاقة تنفيذ مسابقة</button><button class="tab" data-tab="reports">التقارير المحفوظة</button><button class="tab" data-tab="plans" id="plansTab">خطط وبرامج النشاط</button></div>
@@ -20,7 +42,69 @@
 <section id="printArea" class="section"><div id="printContent" class="panel reportview"></div></section><div class="footer"><span>منصة تقارير النشاط الطلابي · مرتبطة بقاعدة بيانات</span><span>رائدة النشاط: فاطمة الحربي · مديرة المدرسة: منال الحربي</span></div></main></div>
 <script>
 const SUPABASE_URL='https://esdzituynhifkhcrropa.supabase.co';const SUPABASE_KEY='sb_publishable_VRrquXOi_Omvixuxt-3EqQ_ozob4cKD';const BUCKET='activity-evidence';const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let reports=[],plans=[],files=[],currentUser=null,isLeader=false;const $=id=>document.getElementById(id);function esc(s=''){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function showMessage(id,msg,error=false){$(id).textContent=msg;$(id).style.color=error?'#d65c5c':''}function showTab(id){if(id==='plans'&&!isLeader){alert('هذه الصفحة مخصصة لرائدة النشاط.');return}document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id!=='printArea')window.scrollTo({top:0,behavior:'smooth'})}document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;showMessage('loginMessage','جارٍ التحقق من بيانات الدخول...');const {error}=await db.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});$('loginBtn').disabled=false;if(error){showMessage('loginMessage','تعذر تسجيل الدخول. تحققي من البريد وكلمة المرور.',true);return}showMessage('loginMessage','تم تسجيل الدخول.')});$('signupBtn').addEventListener('click',async()=>{const email=$('loginEmail').value.trim(),password=$('loginPassword').value;if(!email||!password){showMessage('loginMessage','أدخلي البريد الإلكتروني وكلمة المرور أولاً.',true);return}if(password.length<6){showMessage('loginMessage','يجب ألا تقل كلمة المرور عن 6 أحرف.',true);return}$('signupBtn').disabled=true;showMessage('loginMessage','جارٍ إنشاء الحساب...');try{const {data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:'https://school-activity-reports-ydgq.vercel.app'}});if(error)throw error;showMessage('loginMessage',data.session?'تم إنشاء الحساب.':'تم إرسال طلب التسجيل. تحققي من بريدك الإلكتروني لتأكيد الحساب.')}catch(error){showMessage('loginMessage','تعذر إنشاء الحساب: '+error.message,true)}finally{$('signupBtn').disabled=false}});async function logout(){await db.auth.signOut()}db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>handleSession(session),0)});async function handleSession(session){currentUser=session?.user||null;$('authScreen').classList.toggle('hidden',!!currentUser);$('appScreen').classList.toggle('hidden',!currentUser);if(!currentUser){reports=[];plans=[];return}$('accountLabel').textContent=currentUser.email||'حساب مسجل';await detectRole();await loadReports();if(isLeader)await loadPlans();else{$('plansTab').classList.add('hidden');document.querySelectorAll('.leaderOnly').forEach(el=>el.classList.add('hidden'));$('planCount').textContent='—';$('plansTable').innerHTML='<div class="empty">هذه الصفحة مخصصة لرائدة النشاط.</div>'}}async function detectRole(){try{const {data,error}=await db.rpc('has_role',{check_role:'activity_leader'});isLeader=!error&&data===true}catch(_){isLeader=false}$('plansTab').classList.toggle('hidden',!isLeader);document.querySelectorAll('.leaderOnly').forEach(el=>el.classList.toggle('hidden',!isLeader))}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;showMessage('loginMessage','جارٍ التحقق من بيانات الدخول...');const {error}=await db.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});$('loginBtn').disabled=false;if(error){showMessage('loginMessage','تعذر تسجيل الدخول. تحققي من البريد وكلمة المرور.',true);return}showMessage('loginMessage','تم تسجيل الدخول.')});$('signupBtn').addEventListener('click',async()=>{const email=$('loginEmail').value.trim(),password=$('loginPassword').value;if(!email||!password){showMessage('loginMessage','أدخلي البريد الإلكتروني وكلمة المرور أولاً.',true);return}if(password.length<6){showMessage('loginMessage','يجب ألا تقل كلمة المرور عن 6 أحرف.',true);return}$('signupBtn').disabled=true;showMessage('loginMessage','جارٍ إنشاء الحساب...');try{const {data,error}=await db.auth.signUp({email,password,options:{emailRedirectTo:'https://school-activity-reports-ydgq.vercel.app'}});if(error)throw error;showMessage('loginMessage',data.session?'تم إنشاء الحساب.':'تم إرسال طلب التسجيل. تحققي من بريدك الإلكتروني لتأكيد الحساب.')}catch(error){showMessage('loginMessage','تعذر إنشاء الحساب: '+error.message,true)}finally{$('signupBtn').disabled=false}});async function logout(){await db.auth.signOut()}
+$('forgotPasswordBtn').addEventListener('click',async()=>{
+  const email=$('loginEmail').value.trim();
+  if(!email){
+    showMessage('loginMessage','أدخلي بريدك الإلكتروني أولاً.',true);
+    return;
+  }
+  showMessage('loginMessage','جارٍ إرسال رابط الاستعادة...');
+  try{
+    const {error}=await db.auth.resetPasswordForEmail(email,{
+      redirectTo:'https://school-activity-reports-ydgq.vercel.app/'
+    });
+    if(error) throw error;
+    showMessage('loginMessage','تحققي من بريدك الإلكتروني للعثور على رابط الاستعادة.');
+  }catch(error){
+    showMessage('loginMessage','تعذر إرسال الرابط. تحققي من إعدادات Supabase.',true);
+  }
+});
+$('resetForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const password=$('newPassword').value;
+  const confirm=$('confirmPassword').value;
+  if(password.length<6){
+    showMessage('resetMessage','كلمة المرور يجب أن تكون 6 أحرف على الأقل.',true);
+    return;
+  }
+  if(password!==confirm){
+    showMessage('resetMessage','كلمتا المرور غير متطابقتين.',true);
+    return;
+  }
+  try{
+    const {error}=await db.auth.updateUser({password});
+    if(error) throw error;
+    await db.auth.signOut();
+    $('resetScreen').classList.add('hidden');
+    $('authScreen').classList.remove('hidden');
+    showMessage('loginMessage','تم تحديث كلمة المرور. سجّلي الدخول بكلمتك الجديدة.');
+  }catch(error){
+    showMessage('resetMessage','تعذر تحديث كلمة المرور. افتحي رابط الاستعادة الأحدث من بريدك الإلكتروني.',true);
+  }
+});
+
+let recoveringPassword=false;
+db.auth.onAuthStateChange((event,session)=>{
+  setTimeout(()=>{
+    if(event==='PASSWORD_RECOVERY'){
+      recoveringPassword=true;
+      $('authScreen').classList.add('hidden');
+      $('appScreen').classList.add('hidden');
+      $('resetScreen').classList.remove('hidden');
+      showMessage('resetMessage','أدخلي كلمة المرور الجديدة مرتين.');
+      return;
+    }
+    if(event==='SIGNED_OUT'){
+      recoveringPassword=false;
+      $('resetScreen').classList.add('hidden');
+      handleSession(null);
+      return;
+    }
+    if(!recoveringPassword) handleSession(session);
+  },0);
+});
+;async function handleSession(session){currentUser=session?.user||null;$('authScreen').classList.toggle('hidden',!!currentUser);$('appScreen').classList.toggle('hidden',!currentUser);if(!currentUser){reports=[];plans=[];return}$('accountLabel').textContent=currentUser.email||'حساب مسجل';await detectRole();await loadReports();if(isLeader)await loadPlans();else{$('plansTab').classList.add('hidden');document.querySelectorAll('.leaderOnly').forEach(el=>el.classList.add('hidden'));$('planCount').textContent='—';$('plansTable').innerHTML='<div class="empty">هذه الصفحة مخصصة لرائدة النشاط.</div>'}}async function detectRole(){try{const {data,error}=await db.rpc('has_role',{check_role:'activity_leader'});isLeader=!error&&data===true}catch(_){isLeader=false}$('plansTab').classList.toggle('hidden',!isLeader);document.querySelectorAll('.leaderOnly').forEach(el=>el.classList.toggle('hidden',!isLeader))}
 function normalizeReport(row){let extra={};try{extra=JSON.parse(row.description||'{}')}catch(_){extra={implementation:row.description||''}}return{id:row.id,teacher:row.teacher_name||'',activity:row.activity_title||'',date:row.activity_date||'',category:row.activity_type||'',target:row.target_group||'',location:row.implementation_location||'',goals:extra.goals||'',implementation:extra.implementation||'',recommendations:extra.recommendations||'',outcomes:row.outcomes||'',files:Array.isArray(row.evidence_urls)?row.evidence_urls:[],status:row.status==='submitted'?'قيد المراجعة':(row.status||'قيد المراجعة'),created_by:row.created_by,extra}}async function loadReports(){const {data,error}=await db.from('activity_reports').select('*').order('created_at',{ascending:false});if(error){reports=[];render();showMessage('reportMessage','تعذر تحميل التقارير: '+error.message,true);return}reports=(data||[]).map(normalizeReport);render()}async function loadPlans(){const {data,error}=await db.from('activity_plans').select('*').order('created_at',{ascending:false});if(error){plans=[];$('plansTable').innerHTML='<div class="empty">تعذر تحميل الخطط. تحققي من إعداد جدول الخطط.</div>';return}plans=data||[];render()}
 $('evidence').addEventListener('change',()=>{files=[...$('evidence').files].slice(0,5);$('filePreview').innerHTML=files.map(f=>`<span class="pill">📎 ${esc(f.name)} · ${Math.round(f.size/1024)} KB</span>`).join('');if($('evidence').files.length>5)showMessage('reportMessage','تم اختيار أول 5 ملفات فقط.',true)});async function uploadEvidence(fileList){const paths=[];for(const f of [...fileList].slice(0,5)){if(f.size>8*1024*1024)throw new Error('حجم الملف '+f.name+' يتجاوز 8 ميغابايت.');const safe=f.name.replace(/[^\p{L}\p{N}._-]+/gu,'_');const path=currentUser.id+'/'+crypto.randomUUID()+'-'+safe;const {error}=await db.storage.from(BUCKET).upload(path,f,{upsert:false,contentType:f.type||'application/octet-stream'});if(error)throw new Error('تعذر رفع المرفق '+f.name+': '+error.message);paths.push(path)}return paths}
 $('reportForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser)return;const btn=$('saveReportBtn');btn.disabled=true;showMessage('reportMessage','جارٍ حفظ التقرير والمرفقات...');const g=id=>$(id).value.trim();try{const paths=await uploadEvidence(files);const details=JSON.stringify({goals:g('goals'),implementation:g('implementation'),recommendations:g('recommendations')});const row={activity_title:g('activity'),activity_date:g('date'),activity_type:g('category'),implementation_location:g('location'),target_group:g('target'),teacher_name:g('teacher'),description:details,outcomes:g('outcomes'),evidence_urls:paths,status:'submitted',created_by:currentUser.id};const {error}=await db.from('activity_reports').insert(row);if(error)throw error;clearReportForm();await loadReports();showTab('reports');showMessage('reportMessage','تم حفظ التقرير بنجاح.')}catch(err){showMessage('reportMessage','لم يكتمل الحفظ: '+(err.message||'خطأ غير معروف'),true)}finally{btn.disabled=false}});function clearReportForm(){$('reportForm').reset();$('teacher').value='فاطمة الحربي';files=[];$('filePreview').innerHTML='';showMessage('reportMessage','')}
