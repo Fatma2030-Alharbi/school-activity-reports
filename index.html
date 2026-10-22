@@ -114,4 +114,147 @@ const programData={lower:{'المواطنة والحياة':{'التطوع ال�
 async function saveCard({formId,msgId,buttonId,title,kind,nameId,dateId,domainId,targetId,teacherId,goalsId,executionId,impactId,notesId,evidenceId,extraFields={}}){const form=$(formId),btn=$(buttonId);form.addEventListener('submit',async e=>{e.preventDefault();if(!currentUser)return;btn.disabled=true;showMessage(msgId,'جارٍ حفظ البطاقة والمرفقات...');const g=id=>$(id)?.value?.trim()||'';try{const paths=await uploadEvidence($(evidenceId).files);const extra={card_kind:kind,domain:g(domainId),goals:g(goalsId),implementation:g(executionId),recommendations:g(notesId),...extraFields()};const row={activity_title:g(nameId),activity_date:g(dateId),activity_type:kind+' · '+g(domainId),implementation_location:g(kind==='program'?'programLocation':'compName'),target_group:g(targetId),teacher_name:g(teacherId),description:JSON.stringify(extra),outcomes:g(impactId),evidence_urls:paths,status:'submitted',created_by:currentUser.id};const {error}=await db.from('activity_reports').insert(row);if(error)throw error;form.reset();if(kind==='program'){$('programTeacher').value='فاطمة الحربي';$('programTarget').value='طالبات المدرسة';$('programLocation').value='الابتدائية الرابعة برياض الخبراء';todayFor('programDate');refreshProgramOptions();dateWeekday('programDate','programWeekday')}else{$('compTeacher').value='فاطمة الحربي';$('compTarget').value='طالبات المدرسة';todayFor('compDate');dateWeekday('compDate','compWeekday')};await loadReports();showMessage(msgId,'تم حفظ البطاقة ضمن التقارير المحفوظة. يمكنك فتحها وطباعتها من سجل التقارير.')}catch(err){showMessage(msgId,'لم يكتمل الحفظ: '+(err.message||'خطأ غير معروف'),true)}finally{btn.disabled=false}})}
 saveCard({formId:'programForm',msgId:'programMessage',buttonId:'saveProgramBtn',title:'بطاقة تنفيذ برنامج نشاط',kind:'program',nameId:'programName',dateId:'programDate',domainId:'programDomain',targetId:'programTarget',teacherId:'programTeacher',goalsId:'programGoals',executionId:'programExecution',impactId:'programImpact',notesId:'programNotes',evidenceId:'programEvidence',extraFields:()=>({stage:$('programStage').value,periods_allocated:$('programPeriods').value,periods_completed:$('programDone').value,week:$('programWeek').value})});saveCard({formId:'competitionForm',msgId:'competitionMessage',buttonId:'saveCompetitionBtn',title:'بطاقة تنفيذ مسابقة نشاط',kind:'competition',nameId:'compName',dateId:'compDate',domainId:'compDomain',targetId:'compTarget',teacherId:'compTeacher',goalsId:'compGoals',executionId:'compMechanism',impactId:'compResults',notesId:'compRecommendations',evidenceId:'compEvidence',extraFields:()=>({weekday:$('compWeekday').value,participants:$('compParticipants').value,winners:$('compWinners').value})});
 function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())return;const labels=[...f.querySelectorAll('label')];const rows=labels.map(l=>{const el=$(l.htmlFor);if(!el||el.type==='file'||el.tagName==='BUTTON')return'';let value=el.tagName==='SELECT'?el.selectedOptions[0]?.textContent:el.value;return `<tr><th>${esc(l.textContent)}</th><td>${esc(value||'—')}</td></tr>`}).join('');$('printContent').innerHTML=`<div class="printhead"><h1>${esc(title)}</h1><p>الابتدائية الرابعة برياض الخبراء · إدارة تعليم القصيم</p></div><h1>${esc(title)}</h1><table class="printtable">${rows}</table><div class="footer"><span>منفذة النشاط: فاطمة الحربي</span><span>مديرة المدرسة: منال الحربي</span></div><div class="actions noprint"><button class="primary" onclick="window.print()">طباعة / حفظ PDF</button><button class="secondary" onclick="showTab('${formId==='programForm'?'program':'competition'}')">عودة</button></div>`;showTab('printArea');window.print()}
+</script><script>
+(function () {
+  const tabs = document.querySelector('.tabs');
+  const main = document.querySelector('#appScreen main.wrap');
+  if (!tabs || !main || document.getElementById('signatureSection')) return;
+
+  const tab = document.createElement('button');
+  tab.className = 'tab';
+  tab.dataset.tab = 'signature';
+  tab.textContent = 'توقيعي الإلكتروني';
+  tabs.insertBefore(tab, document.getElementById('plansTab'));
+
+  const section = document.createElement('section');
+  section.id = 'signatureSection';
+  section.className = 'section';
+  section.innerHTML = `
+    <div class="panel">
+      <h2>توقيعي الإلكتروني</h2>
+      <p>ارسمي توقيعك بإصبعك، ثم احفظيه لاستخدامه لاحقًا.</p>
+      <canvas id="savedSignatureCanvas"
+        width="900" height="240"
+        style="display:block;width:100%;height:220px;
+        border:1px solid #aab9b4;border-radius:10px;
+        background:white;touch-action:none"></canvas>
+      <div class="actions">
+        <button type="button" class="secondary" id="clearSignature">مسح التوقيع</button>
+        <button type="button" class="primary" id="saveSignature">حفظ توقيعي</button>
+      </div>
+      <p id="signatureMessage" class="statusline" role="status"></p>
+    </div>`;
+  main.appendChild(section);
+
+  tab.addEventListener('click', () => {
+    showTab('signatureSection');
+    loadSignature();
+  });
+
+  const canvas = document.getElementById('savedSignatureCanvas');
+  const ctx = canvas.getContext('2d');
+  const message = document.getElementById('signatureMessage');
+  let drawing = false;
+  let hasInk = false;
+
+  ctx.strokeStyle = '#183d32';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  canvas.addEventListener('pointerdown', e => {
+    if (!currentUser) {
+      message.textContent = 'سجّلي الدخول أولًا.';
+      return;
+    }
+    drawing = true;
+    hasInk = true;
+    canvas.setPointerCapture(e.pointerId);
+    const r = canvas.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(
+      (e.clientX - r.left) * canvas.width / r.width,
+      (e.clientY - r.top) * canvas.height / r.height
+    );
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!drawing) return;
+    const r = canvas.getBoundingClientRect();
+    ctx.lineTo(
+      (e.clientX - r.left) * canvas.width / r.width,
+      (e.clientY - r.top) * canvas.height / r.height
+    );
+    ctx.stroke();
+  });
+
+  function stopDrawing() { drawing = false; }
+  canvas.addEventListener('pointerup', stopDrawing);
+  canvas.addEventListener('pointercancel', stopDrawing);
+
+  document.getElementById('clearSignature').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasInk = false;
+    message.textContent = 'تم مسح الرسم من اللوحة.';
+  });
+
+  async function loadSignature() {
+    if (!currentUser) {
+      message.textContent = 'سجّلي الدخول أولًا.';
+      return;
+    }
+    message.textContent = 'جارٍ تحميل توقيعك المحفوظ...';
+    const { data, error } = await db
+      .from('user_signatures')
+      .select('signature_data')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      message.textContent = 'تعذر تحميل التوقيع: ' + error.message;
+      return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasInk = false;
+
+    if (data && data.signature_data) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        hasInk = true;
+        message.textContent = 'تم تحميل توقيعك المحفوظ.';
+      };
+      img.onerror = () => {
+        message.textContent = 'تعذر عرض التوقيع المحفوظ.';
+      };
+      img.src = data.signature_data;
+    } else {
+      message.textContent = 'لا يوجد توقيع محفوظ. ارسمي توقيعك ثم احفظيه.';
+    }
+  }
+
+  document.getElementById('saveSignature').addEventListener('click', async () => {
+    if (!currentUser) {
+      message.textContent = 'سجّلي الدخول أولًا.';
+      return;
+    }
+    if (!hasInk) {
+      message.textContent = 'ارسمي توقيعك قبل الحفظ.';
+      return;
+    }
+
+    message.textContent = 'جارٍ حفظ التوقيع...';
+    const { error } = await db.from('user_signatures').upsert({
+      user_id: currentUser.id,
+      signature_data: canvas.toDataURL('image/png'),
+      updated_at: new Date().toISOString()
+    });
+
+    message.textContent = error
+      ? 'تعذر الحفظ: ' + error.message
+      : 'تم حفظ توقيعك في حسابك بنجاح.';
+  });
+})();
 </script></body></html>
