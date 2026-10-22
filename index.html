@@ -257,4 +257,92 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
       : 'تم حفظ توقيعك في حسابك بنجاح.';
   });
 })();
-</script></body></html>
+</script>
+<script>
+(function () {
+  if (typeof window.viewReport !== 'function') {
+    console.error('لم يتم العثور على دالة عرض التقرير.');
+    return;
+  }
+
+  const originalViewReport = window.viewReport;
+
+  window.viewReport = async function (id) {
+    await originalViewReport(id);
+
+    const report = reports.find(
+      item => Number(item.id) === Number(id)
+    );
+    if (!report) return;
+
+    const userIds = [report.created_by];
+    if (isLeader && currentUser) userIds.push(currentUser.id);
+
+    const uniqueIds = [...new Set(userIds.filter(Boolean))];
+    const { data, error } = await db
+      .from('user_signatures')
+      .select('user_id, signature_data')
+      .in('user_id', uniqueIds);
+
+    if (error) {
+      console.error('تعذر تحميل التوقيعات:', error.message);
+      return;
+    }
+
+    const teacherSignature = data.find(
+      item => item.user_id === report.created_by
+    );
+    const leaderSignature = isLeader && currentUser
+      ? data.find(item => item.user_id === currentUser.id)
+      : null;
+
+    const footer = document.querySelector('#printContent .footer');
+    if (!footer) return;
+
+    document.getElementById('reportSignatures')?.remove();
+
+    const box = document.createElement('div');
+    box.id = 'reportSignatures';
+    box.style.cssText =
+      'display:flex;justify-content:space-between;gap:20px;' +
+      'margin-top:28px;page-break-inside:avoid;';
+
+    function makeSignature(label, signature) {
+      const item = document.createElement('div');
+      item.style.cssText =
+        'flex:1;text-align:center;min-width:0;';
+
+      const title = document.createElement('div');
+      title.textContent = label;
+      item.appendChild(title);
+
+      if (signature?.signature_data) {
+        const img = document.createElement('img');
+        img.src = signature.signature_data;
+        img.alt = label;
+        img.style.cssText =
+          'display:block;width:180px;max-width:100%;' +
+          'height:65px;object-fit:contain;margin:4px auto;';
+        item.appendChild(img);
+      } else {
+        const note = document.createElement('div');
+        note.textContent = 'لا يوجد توقيع محفوظ';
+        note.style.cssText = 'font-size:12px;margin-top:12px;';
+        item.appendChild(note);
+      }
+
+      return item;
+    }
+
+    box.appendChild(
+      makeSignature('توقيع المعلمة: ' + report.teacher, teacherSignature)
+    );
+    box.appendChild(
+      makeSignature('توقيع رائدة النشاط', leaderSignature)
+    );
+
+    footer.parentNode.insertBefore(box, footer);
+  };
+})();
+</script>
+</body></html>
