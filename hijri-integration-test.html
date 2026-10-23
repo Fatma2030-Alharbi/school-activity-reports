@@ -133,7 +133,8 @@ function render(){
     el.setAttribute('aria-label',fmtFullHijri.format(date));
     if(sameDay(date,today)) el.classList.add('today');
     if(sameDay(date,selectedDate)) el.classList.add('selected');
-    el.addEventListener('click',()=>showSelected(date));
+    const chosenDate = new Date(date);
+el.addEventListener('click',()=>showSelected(chosenDate));
     calendar.appendChild(el);
     date.setDate(date.getDate()+1);
     count++;
