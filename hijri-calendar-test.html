@@ -68,24 +68,42 @@ function parts(date){
   hijri.formatToParts(date).forEach(x=>{if(x.type!=='literal')p[x.type]=Number(x.value)});
   return p;
 }
+
 function monthStart(y,m){
-  for(let t=Date.UTC(y,0,1);t<=Date.UTC(y+1,0,1);t+=86400000){
-    const d=new Date(t),p=parts(d);
-    if(p.year===y&&p.month===m&&p.day===1)return d;
+  const start = Date.UTC(y + 577, 0, 1);
+  const end = Date.UTC(y + 580, 0, 1);
+
+  for(let t = start; t < end; t += 86400000){
+    const d = new Date(t);
+    const p = parts(d);
+
+    if(p.year === y && p.month === m && p.day === 1){
+   return new Date(Date.UTC(
+  d.getUTCFullYear(),
+  d.getUTCMonth(),
+  d.getUTCDate()
+));
+    }
   }
+
   return null;
 }
+
 const today=new Date();
 let current=parts(today);
 let viewYear=current.year,viewMonth=current.month;
 let selected=today;
 
 function moveMonth(delta){
-  const d=monthStart(viewYear,viewMonth);
-  if(!d)return;
-  const target=new Date(d.getTime()+delta*20*86400000);
-  const p=parts(target);
-  viewYear=p.year;viewMonth=p.month;
+  const start = monthStart(viewYear, viewMonth);
+  if (!start) return;
+
+  const offset = delta > 0 ? 35 : -1;
+  const target = new Date(start.getTime() + offset * 86400000);
+  const p = parts(target);
+
+  viewYear = p.year;
+  viewMonth = p.month;
   render();
 }
 function render(){
