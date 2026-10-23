@@ -175,17 +175,16 @@ function moveMonth(amount){
 
   const base = new Date(viewDate);
   base.setHours(12, 0, 0, 0);
-  base.setDate(base.getDate() - 20);
+  base.setDate(base.getDate() - 40);
 
-  for(let i = 0; i <= 60; i++){
+  for(let i = 0; i <= 80; i++){
     const candidate = new Date(base);
     candidate.setDate(base.getDate() + i);
 
     const p = parts(candidate);
 
     if(p.year === targetYear &&
-       p.month === targetMonth &&
-       p.day === 1){
+       p.month === targetMonth){
       viewDate = candidate;
       render();
       return;
