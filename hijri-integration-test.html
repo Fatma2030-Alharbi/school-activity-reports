@@ -104,17 +104,34 @@ function render(){
     calendar.appendChild(el);
   });
 
-  const target=parts(viewDate);
-  const first=new Date(viewDate.getFullYear(),viewDate.getMonth(),1,12);
-  const last=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,0,12);
-  let start=new Date(first);
-  while(parts(start).month !== target.month ||
-        parts(start).year !== target.year){
-    start.setDate(start.getDate()+1);
-    if(start.getDate()>10) break;
+  
+  const target = parts(viewDate);
+
+  let start = new Date(viewDate);
+  start.setHours(12, 0, 0, 0);
+  start.setDate(start.getDate() - 20);
+
+  let found = false;
+
+  for(let i = 0; i <= 40; i++){
+    const p = parts(start);
+
+    if(p.month === target.month &&
+       p.year === target.year &&
+       p.day === 1){
+      found = true;
+      break;
+    }
+
+    start.setDate(start.getDate() + 1);
   }
-  const firstHijriDay=parts(start).day;
-  const offset=(first.getDay()-((firstHijriDay-1)%7)+7)%7;
+
+  if(!found){
+    calendar.innerHTML = 'تعذر تحديد أيام هذا الشهر.';
+    return;
+  }
+
+  const offset = start.getDay();
   for(let i=0;i<offset;i++){
     const blank=document.createElement('div');
     blank.className='cell empty';
