@@ -158,29 +158,33 @@ el.addEventListener('click',()=>showSelected(chosenDate));
   }
 }
 
-function moveMonth(amount){
-  const p = parts(viewDate);
-  let year = p.year;
-  let month = p.month + amount;
 
-  if(month < 1){
-    month = 12;
-    year--;
-  } else if(month > 12){
-    month = 1;
-    year++;
+function moveMonth(amount){
+  const current = parts(viewDate);
+  let targetYear = current.year;
+  let targetMonth = current.month + amount;
+
+  if(targetMonth < 1){
+    targetMonth = 12;
+    targetYear--;
+  } else if(targetMonth > 12){
+    targetMonth = 1;
+    targetYear++;
   }
 
-  const start = new Date(viewDate);
-  start.setDate(start.getDate() - 40);
+  const base = new Date(viewDate);
+  base.setHours(12, 0, 0, 0);
+  base.setDate(base.getDate() - 20);
 
-  for(let i = 0; i <= 80; i++){
-    const candidate = new Date(start);
-    candidate.setDate(start.getDate() + i);
+  for(let i = 0; i <= 60; i++){
+    const candidate = new Date(base);
+    candidate.setDate(base.getDate() + i);
 
-    const cp = parts(candidate);
+    const p = parts(candidate);
 
-    if(cp.year === year && cp.month === month){
+    if(p.year === targetYear &&
+       p.month === targetMonth &&
+       p.day === 1){
       viewDate = candidate;
       render();
       return;
@@ -189,6 +193,7 @@ function moveMonth(amount){
 
   alert('تعذر العثور على الشهر المطلوب. حاولي تحديث الصفحة.');
 }
+
 
 document.getElementById('prev').addEventListener('click',()=>moveMonth(-1));
 document.getElementById('next').addEventListener('click',()=>moveMonth(1));
