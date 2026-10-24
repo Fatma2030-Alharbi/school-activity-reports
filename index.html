@@ -345,4 +345,44 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
   };
 })();
 </script>
+
+<script>
+(function () {
+  const fields = [
+    { id: 'date', label: 'تاريخ النشاط' },
+    { id: 'programDate', label: 'تاريخ تنفيذ البرنامج' },
+    { id: 'compDate', label: 'تاريخ تنفيذ المسابقة' }
+  ];
+
+  const hijri = new Intl.DateTimeFormat(
+    'ar-SA-u-ca-islamic-umalqura',
+    { day: 'numeric', month: 'long', year: 'numeric' }
+  );
+
+  fields.forEach(function (item) {
+    const input = document.getElementById(item.id);
+    if (!input || input.dataset.hijriAdded) return;
+    input.dataset.hijriAdded = '1';
+
+    const note = document.createElement('div');
+    note.style.cssText =
+      'font-size:13px;color:#28745b;margin-top:5px';
+
+    function update() {
+      if (!input.value) {
+        note.textContent = 'التاريخ الهجري يظهر هنا';
+        return;
+      }
+      const parts = input.value.split('-').map(Number);
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+      note.textContent = 'التاريخ الهجري: ' + hijri.format(date);
+    }
+
+    input.insertAdjacentElement('afterend', note);
+    input.addEventListener('change', update);
+    update();
+  });
+})();
+</script>
+
 </body></html>
