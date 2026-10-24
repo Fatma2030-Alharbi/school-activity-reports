@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اختبار التقويم الهجري</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f7f5;margin:0;padding:20px;color:#243b32}
+main{max-width:460px;margin:20px auto;background:white;padding:20px;border-radius:16px;box-shadow:0 4px 18px #0001}
+h2{text-align:center;color:#176b50}
+p{text-align:center;color:#52665d}
+button,select{font:inherit;padding:10px;border:1px solid #cbd9d1;border-radius:9px;background:white;color:#243b32}
+button{cursor:pointer}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:18px 0}
+#monthTitle{font-weight:bold;text-align:center;flex:1}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cell{padding:10px 0;border-radius:8px;min-width:0}
+.week{font-size:12px;font-weight:bold;color:#176b50;padding:8px 0}
+.day{border:1px solid #edf1ee}
+.day:hover,.day:focus{background:#e0f2e9}
+.day.selected{background:#176b50;color:white}
+.day.today{border:2px solid #176b50}
+.empty{visibility:hidden}
+.result{background:#edf7f1;padding:14px;border-radius:10px;margin-top:18px;line-height:2;text-align:center}
+.small{font-size:12px;color:#66766d;text-align:center;margin-top:16px}
+</style>
+</head>
+<body>
+<main>
+<h2>التقويم الهجري أم القرى</h2>
+<p>اختاري اليوم الهجري لعرض التاريخ الميلادي المقابل.</p>
+
+<div class="nav">
+<button id="prev" type="button" aria-label="الشهر السابق">السابق</button>
+<div id="monthTitle"></div>
+<button id="next" type="button" aria-label="الشهر التالي">التالي</button>
+<button id="todayBtn" type="button">اليوم</button>
+</div>
+
+<div class="grid" id="calendar"></div>
+
+<div class="result" aria-live="polite">
+<div>التاريخ الهجري: <strong id="hijriResult">—</strong></div>
+<div>التاريخ الميلادي: <strong id="gregResult">—</strong></div>
+</div>
+<div class="small">نسخة تجريبية مستقلة — لا تحفظ أي بيانات.</div>
+</main>
+
+<script>
+(function(){
+const fmtHijri = new Intl.DateTimeFormat(
+  'en-u-ca-islamic-umalqura-nu-latn',
+  {day:'numeric',month:'numeric',year:'numeric'}
+);
+const fmtMonth = new Intl.DateTimeFormat(
+  'ar-SA-u-ca-islamic-umalqura',
+  {month:'long',year:'numeric'}
+);
+const fmtFullHijri = new Intl.DateTimeFormat(
+  'ar-SA-u-ca-islamic-umalqura',
+  {day:'numeric',month:'long',year:'numeric'}
+);
+const fmtGreg = new Intl.DateTimeFormat(
+  'ar-SA-u-ca-gregory',
+  {day:'numeric',month:'long',year:'numeric'}
+);
+const today = new Date();
+today.setHours(12,0,0,0);
+let viewDate = new Date(today);
+let selectedDate = new Date(today);
+
+const calendar = document.getElementById('calendar');
+const title = document.getElementById('monthTitle');
+const hijriResult = document.getElementById('hijriResult');
+const gregResult = document.getElementById('gregResult');
+const weekdays = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+
+function parts(date){
+  const p = {};
+  fmtHijri.formatToParts(date).forEach(x => {
+    if(x.type !== 'literal') p[x.type] = Number(x.value);
+  });
+  return p;
+}
+function sameDay(a,b){
+  return a.getFullYear()===b.getFullYear() &&
+    a.getMonth()===b.getMonth() &&
+    a.getDate()===b.getDate();
+}
+function showSelected(date){
+  selectedDate = new Date(date);
+  hijriResult.textContent = fmtFullHijri.format(date);
+  gregResult.textContent = fmtGreg.format(date);
+  render();
+}
+function render(){
+  calendar.innerHTML = '';
+  title.textContent = fmtMonth.format(viewDate);
+
+  weekdays.forEach(name=>{
+    const el=document.createElement('div');
+    el.className='week';
+    el.textContent=name;
+    calendar.appendChild(el);
+  });
+
+  
+  const target = parts(viewDate);
+
+  let start = new Date(viewDate);
+  start.setHours(12, 0, 0, 0);
+  start.setDate(start.getDate() - 20);
+
+  let found = false;
+
+  for(let i = 0; i <= 40; i++){
+    const p = parts(start);
+
+    if(p.month === target.month &&
+       p.year === target.year &&
+       p.day === 1){
+      found = true;
+      break;
+    }
+
+    start.setDate(start.getDate() + 1);
+  }
+
+  if(!found){
+    calendar.innerHTML = 'تعذر تحديد أيام هذا الشهر.';
+    return;
+  }
+
+  const offset = start.getDay();
+  for(let i=0;i<offset;i++){
+    const blank=document.createElement('div');
+    blank.className='cell empty';
+    calendar.appendChild(blank);
+  }
+
+  let date=new Date(start);
+  let count=0;
+  while(count<31){
+    const p=parts(date);
+    if(p.month!==target.month || p.year!==target.year) break;
+    const el=document.createElement('button');
+    el.type='button';
+    el.className='cell day';
+    el.textContent=p.day;
+    el.setAttribute('aria-label',fmtFullHijri.format(date));
+    if(sameDay(date,today)) el.classList.add('today');
+    if(sameDay(date,selectedDate)) el.classList.add('selected');
+    const chosenDate = new Date(date);
+el.addEventListener('click',()=>showSelected(chosenDate));
+    calendar.appendChild(el);
+    date.setDate(date.getDate()+1);
+    count++;
+  }
+}
+
+
+function moveMonth(amount){
+  const current = parts(viewDate);
+  let targetYear = current.year;
+  let targetMonth = current.month + amount;
+
+  if(targetMonth < 1){
+    targetMonth = 12;
+    targetYear--;
+  } else if(targetMonth > 12){
+    targetMonth = 1;
+    targetYear++;
+  }
+
+  const base = new Date(viewDate);
+  base.setHours(12, 0, 0, 0);
+  base.setDate(base.getDate() - 40);
+
+  for(let i = 0; i <= 80; i++){
+    const candidate = new Date(base);
+    candidate.setDate(base.getDate() + i);
+
+    const p = parts(candidate);
+
+    if(p.year === targetYear &&
+       p.month === targetMonth){
+      viewDate = candidate;
+      render();
+      return;
+    }
+  }
+
+  alert('تعذر العثور على الشهر المطلوب. حاولي تحديث الصفحة.');
+}
+
+
+document.getElementById('prev').addEventListener('click',()=>moveMonth(-1));
+document.getElementById('next').addEventListener('click',()=>moveMonth(1));
+document.getElementById('todayBtn').addEventListener('click',()=>{
+  viewDate = new Date(today);
+  showSelected(today);
+});
+  showSelected(today);
+})();
+</script>
+</body>
+</html>
