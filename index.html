@@ -435,6 +435,7 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
     { day: 'numeric', month: 'long', year: 'numeric' }
   );
 
+ 
   function getHijri(value) {
     const match = String(value || '').match(
       /(\d{4})-(\d{2})-(\d{2})/
@@ -447,8 +448,16 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
       Number(match[3]),
       12
     );
-    return formatter.format(date);
+
+    const parts = new Intl.DateTimeFormat(
+      'en-US-u-ca-islamic-umalqura-nu-latn',
+      { day: '2-digit', month: '2-digit', year: 'numeric' }
+    ).formatToParts(date);
+
+    const get = type => parts.find(part => part.type === type)?.value;
+    return `${get('day')}/${get('month')}/${get('year')}`;
   }
+
 
   function updatePrintContent() {
     const root = document.getElementById('printContent');
@@ -462,8 +471,8 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
       if (!match) return;
 
       const span = document.createElement('span');
-      span.textContent = '　التاريخ الهجري: ' + getHijri(match[0]);
-      p.appendChild(span);
+            p.textContent = 'تاريخ التنفيذ: ' + getHijri(match[0]) + 'هـ';
+      p.dataset.hijriAdded = 'yes';
       p.dataset.hijriAdded = 'yes';
     });
 
@@ -481,14 +490,8 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
       const hijri = getHijri(td.textContent.trim());
       if (!hijri) return;
 
-      const newRow = document.createElement('tr');
-      const newTh = document.createElement('th');
-      const newTd = document.createElement('td');
-
-      newTh.textContent = 'التاريخ الهجري';
-      newTd.textContent = hijri;
-      newRow.append(newTh, newTd);
-      tr.after(newRow);
+            th.textContent = 'تاريخ التنفيذ';
+      td.textContent = hijri + 'هـ';
       tr.dataset.hijriAdded = 'yes';
     });
   }
