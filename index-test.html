@@ -515,4 +515,330 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
 })();
 </script>
 
+<style>
+@media print {
+  body.official-card-print * { visibility: hidden !important; }
+  body.official-card-print #officialActivityCard,
+  body.official-card-print #officialActivityCard * { visibility: visible !important; }
+  body.official-card-print #officialActivityCard {
+    display: block !important; position: absolute; top: 0; right: 0;
+    width: 100%; background: white; color: #111; padding: 12px;
+    font-family: Tahoma, Arial, sans-serif;
+  }
+  body.official-card-print #officialActivityCard .no-print { display: none !important; }
+  body.official-card-print #officialActivityCard input,
+  body.official-card-print #officialActivityCard select,
+  body.official-card-print #officialActivityCard textarea {
+    color: #111; background: white; border: 0; padding: 3px;
+  }
+}
+#officialActivityCard .official-grid {
+  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px;
+}
+#officialActivityCard .official-field {
+  border: 1px solid #778a83; padding: 8px; border-radius: 4px;
+}
+#officialActivityCard .official-field.full { grid-column: 1/-1; }
+#officialActivityCard .official-heading {
+  text-align: center; border: 2px solid #285b4b; padding: 12px;
+  margin-bottom: 12px; color: #214f40;
+}
+#officialActivityCard .official-signatures {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  text-align: center; margin-top: 22px;
+}
+#officialActivityCard .official-signatures img {
+  display: block; width: 150px; height: 60px; object-fit: contain;
+  margin: 5px auto;
+}
+@media(max-width:600px) {
+  #officialActivityCard .official-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+(function () {
+  if (document.getElementById('officialActivityCard')) return;
+
+  const tabBar = document.querySelector('.tabs');
+  const main = document.querySelector('#appScreen main.wrap');
+  if (!tabBar || !main) {
+    console.error('تعذر إضافة البطاقة: لم يتم العثور على مساحة المنصة.');
+    return;
+  }
+
+  const tab = document.createElement('button');
+  tab.type = 'button';
+  tab.className = 'tab';
+  tab.dataset.tab = 'officialActivityCard';
+  tab.textContent = 'البطاقة الرسمية للبرنامج';
+  tabBar.appendChild(tab);
+
+  const section = document.createElement('section');
+  section.id = 'officialActivityCard';
+  section.className = 'section';
+  section.innerHTML = `
+    <div class="panel">
+      <div class="official-heading">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div style="font-size:13px;text-align:right">وزارة التعليم<br>Ministry of Education</div>
+          <div style="font-size:12px;text-align:left">الابتدائية الرابعة برياض الخبراء<br>إدارة تعليم القصيم</div>
+        </div>
+        <h2 style="margin:14px 0 0">بطاقة تنفيذ برنامج نشاط طلابي</h2>
+      </div>
+
+      <form id="officialActivityForm">
+        <div class="official-grid">
+          <div class="official-field">
+            <label for="oaSemester">الفصل الدراسي</label>
+            <select id="oaSemester"><option>الأول</option><option>الثاني</option></select>
+          </div>
+          <div class="official-field">
+            <label for="oaName">اسم البرنامج *</label>
+            <input id="oaName" required>
+          </div>
+          <div class="official-field">
+            <label for="oaDomain">مجال البرنامج *</label>
+            <select id="oaDomain" required>
+              <option>المواطنة والحياة</option><option>الثقافة والفنون</option>
+              <option>الرياضة والصحة</option><option>العلوم والتقنية</option>
+              <option>النشاط الكشفي</option><option>مناسبات وطنية وعالمية</option>
+              <option>أخرى</option>
+            </select>
+          </div>
+          <div class="official-field">
+            <label for="oaLessons">عدد الحصص المخصصة للبرنامج</label>
+            <input id="oaLessons" type="number" min="0" value="0">
+          </div>
+          <div class="official-field">
+            <label for="oaGrade">الصف الدراسي</label>
+            <select id="oaGrade">
+              <option>الأول الابتدائي</option><option>الثاني الابتدائي</option>
+              <option>الثالث الابتدائي</option><option>الرابع الابتدائي</option>
+              <option>الخامس الابتدائي</option><option>السادس الابتدائي</option>
+              <option>جميع الصفوف</option>
+            </select>
+          </div>
+          <div class="official-field">
+            <label for="oaStart">تاريخ بداية التنفيذ *</label>
+            <input id="oaStart" type="date" required>
+            <div id="oaStartInfo" class="mini"></div>
+          </div>
+          <div class="official-field">
+            <label for="oaEnd">تاريخ نهاية التنفيذ *</label>
+            <input id="oaEnd" type="date" required>
+            <div id="oaEndInfo" class="mini"></div>
+          </div>
+          <div class="official-field">
+            <label for="oaTeacher">اسم المعلمة المنفذة *</label>
+            <input id="oaTeacher" value="فاطمة الحربي" required>
+          </div>
+          <div class="official-field">
+            <label for="oaStudents">عدد الطالبات المشاركات</label>
+            <input id="oaStudents" type="number" min="0" value="0">
+          </div>
+          <div class="official-field">
+            <label for="oaDisabilities">عدد الطالبات ذوات الإعاقة</label>
+            <input id="oaDisabilities" type="number" min="0" value="0">
+          </div>
+          <div class="official-field">
+            <label for="oaParents">عدد أولياء الأمور المشاركين</label>
+            <input id="oaParents" type="number" min="0" value="0">
+          </div>
+          <div class="official-field full">
+            <label>قناة التنفيذ عبر منصة مدرستي</label>
+            <div style="display:grid;gap:6px;margin-top:8px">
+              <label><input type="checkbox" name="oaChannel" value="بنك الإثراءات" style="width:auto"> بنك الإثراءات</label>
+              <label><input type="checkbox" name="oaChannel" value="التطوير الذاتي" style="width:auto"> التطوير الذاتي</label>
+              <label><input type="checkbox" name="oaChannel" value="قيمنا الغالية" style="width:auto"> قيمنا الغالية</label>
+              <label><input type="checkbox" name="oaChannel" value="نادي القراءة" style="width:auto"> نادي القراءة</label>
+            </div>
+          </div>
+          <div class="official-field">
+            <label for="oaPartnershipCount">عدد الشراكات المجتمعية</label>
+            <input id="oaPartnershipCount" type="number" min="0" value="0">
+          </div>
+          <div class="official-field">
+            <label for="oaPartnershipNames">أسماء الشراكات</label>
+            <textarea id="oaPartnershipNames"></textarea>
+          </div>
+          <div class="official-field full">
+            <label for="oaNotes">الملاحظات</label>
+            <textarea id="oaNotes"></textarea>
+          </div>
+          <div class="official-field full">
+            <label for="oaEvidence">الشواهد والمرفقات</label>
+            <input id="oaEvidence" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+            <div id="oaEvidenceList" class="mini"></div>
+          </div>
+        </div>
+
+        <div class="official-signatures">
+          <div>
+            <strong>منفذة البرنامج</strong>
+            <div id="oaTeacherSignName">فاطمة الحربي</div>
+            <div id="oaTeacherSignDate"></div>
+            <img id="oaTeacherSignature" alt="توقيع المعلمة" style="display:none">
+          </div>
+          <div>
+            <strong>رائدة النشاط</strong>
+            <input id="oaLeader" value="فاطمة الحربي" aria-label="اسم رائدة النشاط">
+            <div id="oaLeaderSignDate"></div>
+            <img id="oaLeaderSignature" alt="توقيع رائدة النشاط" style="display:none">
+          </div>
+        </div>
+
+        <p style="font-size:11px;margin-top:18px">
+          (يتم تعبئة هذه البطاقة عند استكمال الحصص المخصصة للبرنامج وفق ما ورد للبرنامج من حصص في دليل الخطط الدراسية / الإصدار السادس.)
+        </p>
+        <p style="text-align:left;font-size:11px">WWW.MOE.GOV.SA</p>
+
+        <div class="actions no-print">
+          <button type="submit" class="primary" id="oaSave">حفظ البطاقة</button>
+          <button type="button" class="secondary" id="oaPrint">طباعة البطاقة</button>
+        </div>
+        <p id="oaMessage" class="statusline" role="status"></p>
+      </form>
+    </div>`;
+
+  main.appendChild(section);
+
+  function openCard() {
+    if (typeof showTab === 'function') showTab('officialActivityCard');
+    else {
+      document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+      section.classList.add('active');
+    }
+    loadSavedSignatures();
+  }
+  tab.addEventListener('click', openCard);
+
+  const $ = id => document.getElementById(id);
+  const form = $('officialActivityForm');
+  const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+    day:'numeric', month:'long', year:'numeric'
+  });
+  const weekday = new Intl.DateTimeFormat('ar-SA', {weekday:'long'});
+
+  function dateInfo(inputId, infoId) {
+    const value = $(inputId).value;
+    if (!value) { $(infoId).textContent = ''; return; }
+    const d = new Date(value + 'T12:00:00');
+    $(infoId).textContent = weekday.format(d) + ' · ' + hijri.format(d) + 'هـ';
+  }
+  $('oaStart').addEventListener('change', () => dateInfo('oaStart','oaStartInfo'));
+  $('oaEnd').addEventListener('change', () => {
+    dateInfo('oaEnd','oaEndInfo');
+    $('oaTeacherSignDate').textContent = $('oaEnd').value;
+    $('oaLeaderSignDate').textContent = $('oaEnd').value;
+  });
+  $('oaTeacher').addEventListener('input', () => {
+    $('oaTeacherSignName').textContent = $('oaTeacher').value;
+  });
+  $('oaEvidence').addEventListener('change', () => {
+    $('oaEvidenceList').textContent = [...$('oaEvidence').files].map(f => f.name).join('، ');
+  });
+
+  async function loadSavedSignatures() {
+    if (!window.currentUser) return;
+    try {
+      const ids = [window.currentUser.id];
+      const {data} = await window.db.from('user_signatures')
+        .select('user_id,signature_data').in('user_id', ids);
+      if (!data) return;
+      const mine = data.find(x => x.user_id === window.currentUser.id);
+      if (mine && mine.signature_data) {
+        $('oaTeacherSignature').src = mine.signature_data;
+        $('oaTeacherSignature').style.display = 'block';
+        $('oaLeaderSignature').src = mine.signature_data;
+        $('oaLeaderSignature').style.display = 'block';
+      }
+    } catch (e) {
+      console.warn('تعذر تحميل التوقيع المحفوظ', e);
+    }
+  }
+
+  $('oaPrint').addEventListener('click', () => {
+    if (!form.reportValidity()) return;
+    document.body.classList.add('official-card-print');
+    window.print();
+    setTimeout(() => document.body.classList.remove('official-card-print'), 700);
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!window.currentUser || !window.db) {
+      $('oaMessage').textContent = 'سجّلي الدخول أولًا لحفظ البطاقة.';
+      return;
+    }
+    const btn = $('oaSave');
+    btn.disabled = true;
+    $('oaMessage').textContent = 'جارٍ حفظ البطاقة...';
+    try {
+      if ($('oaStart').value > $('oaEnd').value) {
+        throw new Error('تاريخ البداية يجب ألا يكون بعد تاريخ النهاية.');
+      }
+      const files = [...$('oaEvidence').files];
+      if (files.length > 5) throw new Error('الحد الأقصى خمسة ملفات.');
+      if (files.some(f => f.size > 8 * 1024 * 1024)) {
+        throw new Error('حجم كل ملف يجب ألا يتجاوز 8 ميغابايت.');
+      }
+
+      let evidencePaths = [];
+      if (files.length) {
+        if (typeof window.uploadEvidence === 'function') {
+          evidencePaths = await window.uploadEvidence($('oaEvidence').files);
+        } else {
+          throw new Error('لم تتوفر دالة رفع الشواهد في المنصة الحالية.');
+        }
+      }
+
+      const details = {
+        card_kind: 'official_activity_program',
+        semester: $('oaSemester').value,
+        domain: $('oaDomain').value,
+        lessons: $('oaLessons').value,
+        grade: $('oaGrade').value,
+        start_date: $('oaStart').value,
+        start_date_hijri: $('oaStartInfo').textContent,
+        end_date: $('oaEnd').value,
+        end_date_hijri: $('oaEndInfo').textContent,
+        students: $('oaStudents').value,
+        students_with_disabilities: $('oaDisabilities').value,
+        parents: $('oaParents').value,
+        madrasati_channels: [...document.querySelectorAll('input[name="oaChannel"]:checked')].map(x => x.value),
+        partnership_count: $('oaPartnershipCount').value,
+        partnership_names: $('oaPartnershipNames').value,
+        notes: $('oaNotes').value,
+        leader: $('oaLeader').value
+      };
+
+      const {error} = await window.db.from('activity_reports').insert({
+        activity_title: $('oaName').value.trim(),
+        activity_date: $('oaEnd').value,
+        activity_type: 'بطاقة تنفيذ برنامج نشاط',
+        implementation_location: 'الابتدائية الرابعة برياض الخبراء',
+        target_group: $('oaGrade').value,
+        teacher_name: $('oaTeacher').value.trim(),
+        description: JSON.stringify(details),
+        outcomes: '',
+        evidence_urls: evidencePaths,
+        status: 'submitted',
+        created_by: window.currentUser.id
+      });
+      if (error) throw error;
+
+      $('oaMessage').textContent = 'تم حفظ البطاقة في سجل التقارير.';
+      if (typeof loadReports === 'function') await loadReports();
+    } catch (err) {
+      $('oaMessage').textContent = 'تعذر حفظ البطاقة: ' + (err.message || 'خطأ غير معروف');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  dateInfo('oaStart','oaStartInfo');
+  dateInfo('oaEnd','oaEndInfo');
+})();
+</script>
 </body></html>
