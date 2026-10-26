@@ -532,28 +532,210 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
     color: #111; background: white; border: 0; padding: 3px;
   }
 }
-#officialActivityCard .official-grid {
-  display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px;
+
+#officialActivityCard .panel {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
+  color: #104b60;
+  font-family: Tahoma, Arial, sans-serif;
+  box-sizing: border-box;
 }
-#officialActivityCard .official-field {
-  border: 1px solid #778a83; padding: 8px; border-radius: 4px;
-}
-#officialActivityCard .official-field.full { grid-column: 1/-1; }
+
 #officialActivityCard .official-heading {
-  text-align: center; border: 2px solid #285b4b; padding: 12px;
-  margin-bottom: 12px; color: #214f40;
+  text-align: center;
+  border: 0;
+  padding: 8px;
+  margin-bottom: 12px;
+  color: #104b60;
+  background: #fff;
 }
+
+#officialActivityCard .official-heading > div {
+  justify-content: center !important;
+}
+
+#officialActivityCard .official-heading > div > div:last-child {
+  display: none !important;
+}
+
+#officialActivityCard .official-heading h2 {
+  color: #104b60;
+  font-size: 24px;
+  margin: 12px 0 !important;
+}
+
+#officialActivityCard .official-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(175px, 1fr);
+  gap: 0;
+  border-top: 2px solid #15566b;
+  border-right: 2px solid #15566b;
+}
+
+#officialActivityCard .official-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  border: 0;
+  border-left: 2px solid #15566b;
+  border-bottom: 2px solid #15566b;
+  border-radius: 0;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+#officialActivityCard .official-field:nth-child(4n+1),
+#officialActivityCard .official-field:nth-child(4n+2) {
+  background: #e0f0f3;
+}
+
+#officialActivityCard .official-field.full {
+  grid-column: 1 / -1;
+}
+
+#officialActivityCard .official-field label {
+  color: #104b60;
+  font-weight: bold;
+}
+
+#officialActivityCard .official-field input:not([type="checkbox"]),
+#officialActivityCard .official-field select,
+#officialActivityCard .official-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #c4d0dc;
+  border-radius: 5px;
+  background: #fff;
+  color: #234c5e;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+#officialActivityCard .official-field textarea {
+  min-height: 55px;
+}
+
+#officialActivityCard .hijri-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
 #officialActivityCard .official-signatures {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-  text-align: center; margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+  text-align: right;
 }
+
+#officialActivityCard .official-signatures > div {
+  min-width: 0;
+  padding: 10px;
+  border: 2px solid #15566b;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+#officialActivityCard .official-signatures strong {
+  display: block;
+  margin: -10px -10px 10px;
+  padding: 10px;
+  text-align: center;
+  color: #104b60;
+  background: #e0f0f3;
+  border-bottom: 2px solid #15566b;
+}
+
 #officialActivityCard .official-signatures img {
-  display: block; width: 150px; height: 60px; object-fit: contain;
-  margin: 5px auto;
+  display: block;
+  max-width: 100%;
+  height: 65px;
+  object-fit: contain;
 }
-@media(max-width:600px) {
-  #officialActivityCard .official-grid { grid-template-columns: 1fr; }
+
+#officialActivityCard .actions {
+  margin-top: 14px;
 }
+
+@page {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
+@media print {
+  body.official-card-print * {
+    visibility: hidden !important;
+  }
+
+  body.official-card-print #officialActivityCard,
+  body.official-card-print #officialActivityCard * {
+    visibility: visible !important;
+  }
+
+  body.official-card-print #officialActivityCard {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    color: #104b60 !important;
+  }
+
+  body.official-card-print #officialActivityCard .panel {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  body.official-card-print #officialActivityCard .no-print {
+    display: none !important;
+  }
+
+  body.official-card-print #officialActivityCard .official-field {
+    break-inside: avoid;
+    padding: 5px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.official-card-print #officialActivityCard input,
+  body.official-card-print #officialActivityCard select,
+  body.official-card-print #officialActivityCard textarea {
+    color: #111 !important;
+    background: transparent !important;
+    border: 0 !important;
+    padding: 3px !important;
+    appearance: none;
+  }
+
+  body.official-card-print #officialActivityCard .official-signatures {
+    grid-template-columns: 1fr 1fr;
+    break-inside: avoid;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #officialActivityCard .panel {
+    padding: 6px;
+  }
+
+  #officialActivityCard .official-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(115px, 1fr);
+  }
+
+  #officialActivityCard .official-signatures {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>
 
 <script>
