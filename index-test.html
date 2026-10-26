@@ -620,15 +620,39 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
             </select>
           </div>
           <div class="official-field">
-            <label for="oaStart">تاريخ بداية التنفيذ *</label>
-            <input id="oaStart" type="date" required>
-            <div id="oaStartInfo" class="mini"></div>
-          </div>
-          <div class="official-field">
-            <label for="oaEnd">تاريخ نهاية التنفيذ *</label>
-            <input id="oaEnd" type="date" required>
-            <div id="oaEndInfo" class="mini"></div>
-          </div>
+  <label>تاريخ بداية التنفيذ (هجري) *</label>
+  <div class="hijri-picker">
+    <select id="oaStartDay" required>
+      <option value="">اليوم</option>
+    </select>
+    <select id="oaStartMonth" required>
+      <option value="">الشهر الهجري</option>
+    </select>
+    <select id="oaStartYear" required>
+      <option value="">السنة الهجرية</option>
+    </select>
+  </div>
+  <input id="oaStart" type="hidden">
+  <div id="oaStartInfo" class="mini"></div>
+</div>
+
+<div class="official-field">
+  <label>تاريخ نهاية التنفيذ (هجري) *</label>
+  <div class="hijri-picker">
+    <select id="oaEndDay" required>
+      <option value="">اليوم</option>
+    </select>
+    <select id="oaEndMonth" required>
+      <option value="">الشهر الهجري</option>
+    </select>
+    <select id="oaEndYear" required>
+      <option value="">السنة الهجرية</option>
+    </select>
+  </div>
+  <input id="oaEnd" type="hidden">
+  <div id="oaEndInfo" class="mini"></div>
+</div>
+        
           <div class="official-field">
             <label for="oaTeacher">اسم المعلمة المنفذة *</label>
             <input id="oaTeacher" value="فاطمة الحربي" required>
@@ -715,23 +739,128 @@ function printDraft(formId,title){const f=$(formId);if(!f.reportValidity())retur
 
   const $ = id => document.getElementById(id);
   const form = $('officialActivityForm');
-  const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
-    day:'numeric', month:'long', year:'numeric'
+   const hijri = new Intl.DateTimeFormat(
+    'ar-SA-u-ca-islamic-umalqura',
+    { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }
+  );
+
+  const hijriParts = new Intl.DateTimeFormat(
+    'en-u-ca-islamic-umalqura-nu-latn',
+    { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC' }
+  );
+
+  const weekday = new Intl.DateTimeFormat('ar-SA', {
+    weekday: 'long',
+    timeZone: 'UTC'
   });
-  const weekday = new Intl.DateTimeFormat('ar-SA', {weekday:'long'});
+
+  const months = [
+    'محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر',
+    'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان',
+    'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'
+  ];
+
+  function getHijriParts(date) {
+    const result = {};
+    hijriParts.formatToParts(date).forEach(part => {
+      if (part.type !== 'literal') {
+        result[part.type] = Number(part.value);
+      }
+    });
+    return result;
+  }
 
   function dateInfo(inputId, infoId) {
     const value = $(inputId).value;
-    if (!value) { $(infoId).textContent = ''; return; }
-    const d = new Date(value + 'T12:00:00');
-    $(infoId).textContent = weekday.format(d) + ' · ' + hijri.format(d) + 'هـ';
+    if (!value) {
+      $(infoId).textContent = 'اختاري اليوم والشهر والسنة الهجرية.';
+      return;
+    }
+
+    const date = new Date(value + 'T12:00:00Z');
+    $(infoId).textContent =
+      weekday.format(date) + ' · ' + hijri.format(date) + ' هـ';
   }
-  $('oaStart').addEventListener('change', () => dateInfo('oaStart','oaStartInfo'));
-  $('oaEnd').addEventListener('change', () => {
-    dateInfo('oaEnd','oaEndInfo');
-    $('oaTeacherSignDate').textContent = $('oaEnd').value;
-    $('oaLeaderSignDate').textContent = $('oaEnd').value;
-  });
+
+  function syncHijriDate(prefix) {
+    const day = Number($(prefix + 'Day').value);
+    const month = Number($(prefix + 'Month').value);
+    const year = Number($(prefix + 'Year').value);
+    const hidden = $(prefix);
+    const info = $(prefix + 'Info');
+
+    hidden.value = '';
+
+    if (!day || !month || !year) {
+      info.textContent = 'اختاري اليوم والشهر والسنة الهجرية.';
+      return;
+    }
+
+    // البحث عن التاريخ المطابق في تقويم أم القرى
+    const from = Date.UTC(year + 578, 0, 1, 12);
+    const to = Date.UTC(year + 581, 0, 1, 12);
+    let found = null;
+
+    for (let time = from; time < to; time += 86400000) {
+      const date = new Date(time);
+      const parts = getHijriParts(date);
+
+      if (
+        parts.year === year &&
+        parts.month === month &&
+        parts.day === day
+      ) {
+        found = date;
+        break;
+      }
+    }
+
+    if (!found) {
+      info.textContent = 'التاريخ المختار غير موجود في تقويم أم القرى.';
+      return;
+    }
+
+    const y = found.getUTCFullYear();
+    const m = String(found.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(found.getUTCDate()).padStart(2, '0');
+
+    hidden.value = y + '-' + m + '-' + d;
+    info.textContent =
+      weekday.format(found) + ' · ' + hijri.format(found) + ' هـ';
+
+    if (prefix === 'oaEnd') {
+      $('oaTeacherSignDate').textContent = hidden.value;
+      $('oaLeaderSignDate').textContent = hidden.value;
+    }
+  }
+
+  function setupHijriPicker(prefix) {
+    const day = $(prefix + 'Day');
+    const month = $(prefix + 'Month');
+    const year = $(prefix + 'Year');
+
+    for (let n = 1; n <= 30; n++) {
+      day.add(new Option(String(n), String(n)));
+    }
+
+    months.forEach((name, index) => {
+      month.add(new Option(name, String(index + 1)));
+    });
+
+    [1447, 1448, 1449, 1450].forEach(y => {
+      year.add(new Option(String(y), String(y)));
+    });
+
+    [day, month, year].forEach(select => {
+      select.addEventListener('change', () => syncHijriDate(prefix));
+    });
+  }
+
+  setupHijriPicker('oaStart');
+  setupHijriPicker('oaEnd');
+
+  $('oaStartInfo').textContent = 'اختاري اليوم والشهر والسنة الهجرية.';
+  $('oaEndInfo').textContent = 'اختاري اليوم والشهر والسنة الهجرية.';
   $('oaTeacher').addEventListener('input', () => {
     $('oaTeacherSignName').textContent = $('oaTeacher').value;
   });
